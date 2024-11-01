@@ -93,6 +93,7 @@ export class ProductsController {
   })
   @ApiOperation({ summary: 'Create Product' })
   async create(@Body() body: InsertProduct) {
+    console.log(body)
     const validation = productInsertSchema.safeParse(body);
     if (!validation.success) {
       throw new BadRequestException(validation.error.issues);
