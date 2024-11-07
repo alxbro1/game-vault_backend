@@ -17,15 +17,23 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
-      const request = context.switchToHttp().getRequest() as any;
+      const request = context.switchToHttp().getRequest()
 
-      const token = await getToken({ req:request, secret:JWT_SECRET });
+      const headerAuth = request.headers.authorization as  string
 
-      if (!token?.email) throw new UnauthorizedException();
+      const userId = headerAuth?.split(' ')[1]
+
+
+      console.log(userId)
+/*       const token = await getToken({ req:request, secret:JWT_SECRET });
+
+      if (!token?.email) throw new UnauthorizedException(); */
 
       const user = await db.query.users.findFirst({
-        where: eq(users.email, token.email)
+        where: eq(users.id, userId)
       })
+
+      if (!user) throw new UnauthorizedException();
 
       request.user = user;
       return true; 
