@@ -14,7 +14,7 @@ import { users } from '../../db/schemas/users.schema';
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-
+ 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const request = context.switchToHttp().getRequest()
