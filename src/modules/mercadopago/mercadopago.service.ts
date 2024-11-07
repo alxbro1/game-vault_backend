@@ -19,6 +19,8 @@ export class MercadopagoService {
   ) {}
 
   async create(body: CreateMercadopagoDto, user: SelectUserDto) {
+
+    console.log(body)
     if (!user?.id) {
       throw new BadRequestException('User not found');
     }
@@ -81,20 +83,14 @@ export class MercadopagoService {
         }
 
         let unitPrice = product.price;
-        console.log(`Original price of product ${product.id}: ${unitPrice}`);
 
         if (couponCode && coupon && coupon.isActive) {
           const discountAmount = (unitPrice * coupon.discountPercentage) / 100;
           unitPrice -= discountAmount;
-          console.log(
-            `New price of product ${product.id} after discount: ${unitPrice}`,
-          );
         }
 
         amount += unitPrice * prodReq.quantity;
-        console.log(
-          `Updated amount after adding product ${product.id}: ${amount}`,
-        );
+
 
         return {
           id: product.id,
@@ -109,7 +105,6 @@ export class MercadopagoService {
 
     if (couponCode) {
       await this.couponService.changeStatus(coupon.id, false);
-      console.log(`Coupon with ID: ${coupon.id} has been disabled`);
     }
 
     const totalAfterDiscount = Math.round(amount - discountAmount);
@@ -127,8 +122,8 @@ export class MercadopagoService {
       userId: user.id,
       products: productForOrder,
       amount: totalAfterDiscount,
+      shippingAddress: body.shippingAddress ?? '',
     });
-    console.log('Order created with ID:', orderId);
 
     const orderBody = {
       body: {
@@ -156,13 +151,11 @@ export class MercadopagoService {
   async webhook(body: any) {
     if (body.data) {
       const payment: any = await new Payment(mpClient).get(body.data);
-      console.log('Payment received:', payment);
 
       const products = payment.additional_info.items;
       const metadata = payment.metadata;
 
       if (payment.status == 'approved') {
-        console.log('Payment approved:', payment.id);
 
         const productsData = await this.productsService.findManyByIds(
           products.map((product: { id: any }) => product.id),

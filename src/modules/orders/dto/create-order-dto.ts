@@ -10,6 +10,7 @@ export const createOrderDto = z.object({
     }),
   ),
   amount: z.number(),
+  shippingAddress: z.string()
 });
 
 export type CreateOrderDto = z.infer<typeof createOrderDto>;

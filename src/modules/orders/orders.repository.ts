@@ -21,12 +21,24 @@ import { PaginatedOrdersDto } from './dto/paginated-orders.dto';
 @Injectable()
 export class ordersRepository {
   async create(data: CreateOrderDto) {
-    const order = (await db
-      .insert(orders)
-      .values({
+    let insertData: {
+      userId: string;
+      amount: number;
+      shippingAddress?: string;
+      shippingStatus?: 'pending';
+    };
+    if (data.shippingAddress)
+      insertData = {
+        shippingAddress: data.shippingAddress,
         userId: data.userId,
         amount: data.amount,
-      })
+        shippingStatus: 'pending',
+      };
+    else
+      insertData = {userId: data.userId, amount:data.amount}
+    const order = (await db
+      .insert(orders)
+      .values(insertData)
       .returning()) as any;
     if (!order[0] || !order[0].id)
       throw new BadRequestException('Error creating order');
