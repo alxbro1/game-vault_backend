@@ -19,8 +19,7 @@ export class MercadopagoService {
   ) {}
 
   async create(body: CreateMercadopagoDto, user: SelectUserDto) {
-
-    console.log(body)
+    console.log(body);
     if (!user?.id) {
       throw new BadRequestException('User not found');
     }
@@ -91,7 +90,6 @@ export class MercadopagoService {
 
         amount += unitPrice * prodReq.quantity;
 
-
         return {
           id: product.id,
           title: product.name,
@@ -133,13 +131,19 @@ export class MercadopagoService {
           id: user.id,
         },
         notification_url: `${HOST}/mercadopago/webhook`,
+        back_urls: {
+          success: 'https://gamevault-frontend.vercel.app',
+          pending: 'https://gamevault-frontend.vercel.app',
+          failure: 'https://gamevault-frontend.vercel.app',
+        },
+        auto_return: 'approved',
         metadata: {
           userId: user.id,
           email: user.email,
           orderId,
         },
       },
-    };
+    }
 
     const preference = await new Preference(mpClient).create(orderBody);
 
@@ -156,7 +160,6 @@ export class MercadopagoService {
       const metadata = payment.metadata;
 
       if (payment.status == 'approved') {
-
         const productsData = await this.productsService.findManyByIds(
           products.map((product: { id: any }) => product.id),
         );
