@@ -163,7 +163,7 @@ export class MailController {
     }
   }
 
-  @Post('verified-email/:token')
+  @Get('verified-email/:token')
   async verifiedEmail(@Param('token') token: string) {}
   @Post('send-coupon')
   async sendCoupon(
