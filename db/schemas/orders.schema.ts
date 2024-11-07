@@ -50,12 +50,9 @@ export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export const updateOrderSchema = insertOrderSchema.omit({ id: true }).partial();
 export type UpdateOrder = z.infer<typeof updateOrderSchema>;
 
-export const ordersRelations = relations(orders, ({ one }) => ({
+export const ordersRelations = relations(orders, ({ one, many }) => ({
   user: one(users, { fields: [orders.userId], references: [users.id] }),
-  ordersDetails: one(ordersDetails, {
-    fields: [orders.id],
-    references: [ordersDetails.orderId],
-  }),
+  ordersDetails: many(ordersDetails),
 }));
 
 export const ordersDetails = pgTable('orders_details', {
